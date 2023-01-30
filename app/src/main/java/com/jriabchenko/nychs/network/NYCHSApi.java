@@ -15,14 +15,14 @@ public interface NYCHSApi {
       @Query("$offset") int offset);
 
   @GET(
-      "resource/s3k6-pzi2.json?$select=overview_paragraph,neighborhood,location,"
+      "resource/s3k6-pzi2.json?$select=school_name,overview_paragraph,neighborhood,location,"
           + "phone_number,fax_number,school_email,website,total_students")
-  Call<SchoolDetails> getSchoolDetails(
-      @Query("$$app_token") String applicationToken, @Query("$dbn") String dbn);
+  Call<List<SchoolDetails>> getSchoolDetails(
+      @Query("$$app_token") String applicationToken, @Query("dbn") String dbn);
 
   @GET(
       "resource/f9bf-2cp4.json?$select=num_of_sat_test_takers,sat_critical_reading_avg_score,"
           + "sat_math_avg_score,sat_writing_avg_score")
-  Call<SATResults> getSATResults(
-      @Query("$$app_token") String applicationToken, @Query("$dbn") String dbn);
+  Call<List<SATResults>> getSATResults(
+      @Query("$$app_token") String applicationToken, @Query("dbn") String dbn);
 }

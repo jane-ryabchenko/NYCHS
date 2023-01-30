@@ -3,6 +3,9 @@ package com.jriabchenko.nychs.network;
 import com.squareup.moshi.Json;
 
 public class SchoolDetails {
+  @Json(name = "school_name")
+  String schoolName;
+
   @Json(name = "overview_paragraph")
   String overviewParagraph;
 
@@ -26,4 +29,40 @@ public class SchoolDetails {
 
   @Json(name = "total_students")
   int totalStudents;
+
+  public String getSchoolName() {
+    return schoolName;
+  }
+
+  public String getOverviewParagraph() {
+    return overviewParagraph;
+  }
+
+  public String getNeighborhood() {
+    return neighborhood;
+  }
+
+  public String getLocation() {
+    return location;
+  }
+
+  public String getPhoneNumber() {
+    return phoneNumber;
+  }
+
+  public String getFaxNumber() {
+    return faxNumber;
+  }
+
+  public String getSchoolEmail() {
+    return schoolEmail;
+  }
+
+  public String getWebsite() {
+    return website;
+  }
+
+  public int getTotalStudents() {
+    return totalStudents;
+  }
 }

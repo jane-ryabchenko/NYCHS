@@ -1,41 +1,62 @@
 package com.jriabchenko.nychs.ui;
 
-import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
-
-import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.jriabchenko.nychs.R;
+import com.jriabchenko.nychs.databinding.FragmentListBinding;
 import com.jriabchenko.nychs.network.NYCHSApiService;
 import com.jriabchenko.nychs.network.School;
-import com.jriabchenko.nychs.ui.details.DetailsActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
-    implements SchoolListViewAdapter.SchoolClickHandler {
-  RecyclerView recyclerView;
-  SchoolListViewAdapter schoolListViewAdapter;
-  NYCHSApiService api;
-  List<School> rowsArrayList = new ArrayList<>();
-  boolean isLoading = false;
+public class ListFragment extends Fragment implements SchoolListViewAdapter.SchoolClickHandler {
+
+  private FragmentListBinding binding;
+  private RecyclerView recyclerView;
+  private SchoolListViewAdapter schoolListViewAdapter;
+  private NYCHSApiService api;
+  private List<School> rowsArrayList = new ArrayList<>();
+  private boolean isLoading = false;
 
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
+  public View onCreateView(
+      LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    binding = FragmentListBinding.inflate(inflater, container, false);
+    return binding.getRoot();
+  }
+
+  public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
     api = new NYCHSApiService();
-    recyclerView = findViewById(R.id.schoolListView);
+    recyclerView = binding.schoolListView;
     initAdapter();
     initScrollListener();
     loadMore();
+
+    //    binding.buttonFirst.setOnClickListener(
+    //        new View.OnClickListener() {
+    //          @Override
+    //          public void onClick(View view) {
+    //            NavHostFragment.findNavController(ListFragment.this)
+    //                .navigate(R.id.action_ListFragment_to_DetailsFragment);
+    //          }
+    //        });
+  }
+
+  @Override
+  public void onDestroyView() {
+    super.onDestroyView();
+    binding = null;
   }
 
   private void initAdapter() {
@@ -77,7 +98,10 @@ public class MainActivity extends AppCompatActivity
     schoolListViewAdapter.notifyItemInserted(rowsArrayList.size() - 1);
 
     api.getSchoolList(
-        50, currentSize, schools -> runOnUiThread(() -> onSchoolList(schools)), error -> {});
+        50,
+        currentSize,
+        schools -> getActivity().runOnUiThread(() -> onSchoolList(schools)),
+        error -> {});
   }
 
   private void onSchoolList(List<School> schools) {
@@ -92,8 +116,10 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   public void onSchoolClick(School school) {
-//    Snackbar.make(recyclerView, school.getSchoolName(), LENGTH_SHORT).show();
-    Intent intent = new Intent(this, DetailsActivity.class);
-    startActivity(intent);
+    //    Snackbar.make(recyclerView, school.getSchoolName(), LENGTH_SHORT).show();
+    Bundle bundle = new Bundle();
+    bundle.putString("dbn", school.getDbn());
+    NavHostFragment.findNavController(ListFragment.this)
+        .navigate(R.id.action_ListFragment_to_DetailsFragment, bundle);
   }
 }

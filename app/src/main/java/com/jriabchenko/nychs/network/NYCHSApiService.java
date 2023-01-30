@@ -43,23 +43,28 @@ public class NYCHSApiService {
   public void getSchoolDetails(
       String dbn, ResponseHandler<SchoolDetails> responseHandler, FailureHandler failureHandler) {
     executeApiCallAsync(
-        api.getSchoolDetails(APPLICATION_TOKEN, dbn), responseHandler, failureHandler);
+        api.getSchoolDetails(APPLICATION_TOKEN, dbn),
+        results -> responseHandler.onSuccess(singleResult(results)),
+        failureHandler);
   }
 
   public void getSATResults(
       String dbn, ResponseHandler<SATResults> responseHandler, FailureHandler failureHandler) {
-    executeApiCallAsync(api.getSATResults(APPLICATION_TOKEN, dbn), responseHandler, failureHandler);
+    executeApiCallAsync(
+        api.getSATResults(APPLICATION_TOKEN, dbn),
+        results -> responseHandler.onSuccess(singleResult(results)),
+        failureHandler);
   }
 
   private <T> void executeApiCallAsync(
-      Call<T> call, ResponseHandler<T> responseHandler, FailureHandler failureHandler) {
+      Call<List<T>> call, ResponseHandler<List<T>> responseHandler, FailureHandler failureHandler) {
     executor.execute(() -> executeApiCall(call, responseHandler, failureHandler));
   }
 
   private <T> void executeApiCall(
-      Call<T> call, ResponseHandler<T> responseHandler, FailureHandler failureHandler) {
+      Call<List<T>> call, ResponseHandler<List<T>> responseHandler, FailureHandler failureHandler) {
     try {
-      Response<T> response = call.execute();
+      Response<List<T>> response = call.execute();
       if (!response.isSuccessful()) {
         throw new IllegalStateException(response.message());
       }
@@ -67,5 +72,12 @@ public class NYCHSApiService {
     } catch (IOException e) {
       failureHandler.onFailure(e);
     }
+  }
+
+  private static <T> T singleResult(List<T> results) {
+    if (results.size() != 1) {
+      throw new IllegalStateException("Expected a single result, but received " + results.size());
+    }
+    return results.get(0);
   }
 }
