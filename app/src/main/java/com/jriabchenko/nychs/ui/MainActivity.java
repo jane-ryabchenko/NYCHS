@@ -95,5 +95,7 @@ public class MainActivity extends AppCompatActivity
   @Override
   public void onSchoolClick(School school) {
     Snackbar.make(recyclerView, school.getSchoolName(), LENGTH_SHORT).show();
+//    Intent intent = new Intent(this, DetailsActivity.class);
+//    startActivity(intent);
   }
 }
