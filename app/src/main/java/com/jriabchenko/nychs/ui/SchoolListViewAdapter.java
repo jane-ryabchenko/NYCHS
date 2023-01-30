@@ -7,10 +7,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.jriabchenko.nychs.R;
 import com.jriabchenko.nychs.network.School;
+import com.jriabchenko.nychs.ui.model.SchoolListViewModel;
 
 import java.util.List;
 
@@ -18,12 +23,50 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
   private final int VIEW_TYPE_ITEM = 0;
   private final int VIEW_TYPE_LOADING = 1;
 
-  private final List<School> schools;
+  private final SchoolListViewModel model;
+  private final LifecycleOwner lifecycleOwner;
   private final SchoolClickHandler schoolClickHandler;
+  private RecyclerView recyclerView;
+  private SnackbarWithRetry snackbar;
+  private List<School> schools;
+  private boolean isLoading;
 
-  public SchoolListViewAdapter(List<School> schools, SchoolClickHandler schoolClickHandler) {
-    this.schools = schools;
+  public SchoolListViewAdapter(
+      SchoolListViewModel model,
+      LifecycleOwner lifecycleOwner,
+      SchoolClickHandler schoolClickHandler) {
+    this.model = model;
+    this.lifecycleOwner = lifecycleOwner;
     this.schoolClickHandler = schoolClickHandler;
+  }
+
+  @Override
+  public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+    super.onAttachedToRecyclerView(recyclerView);
+    this.recyclerView = recyclerView;
+    snackbar = new SnackbarWithRetry(recyclerView);
+    recyclerView.addOnScrollListener(
+        new RecyclerView.OnScrollListener() {
+          @Override
+          public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+          }
+
+          @Override
+          public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            LinearLayoutManager linearLayoutManager =
+                (LinearLayoutManager) recyclerView.getLayoutManager();
+            if (!isLoading
+                && linearLayoutManager != null
+                && linearLayoutManager.findLastCompletelyVisibleItemPosition()
+                    == getItemCount() - 1) {
+              // bottom of list!
+              loadMore();
+            }
+          }
+        });
+    loadMore();
   }
 
   @NonNull
@@ -42,12 +85,8 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
-
     if (viewHolder instanceof ItemViewHolder) {
-
       populateItemRows((ItemViewHolder) viewHolder, position);
-    } else if (viewHolder instanceof LoadingViewHolder) {
-      showLoadingView((LoadingViewHolder) viewHolder, position);
     }
   }
 
@@ -56,15 +95,25 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     return schools == null ? 0 : schools.size();
   }
 
-  /**
-   * The following method decides the type of ViewHolder to display in the RecyclerView
-   *
-   * @param position
-   * @return
-   */
   @Override
   public int getItemViewType(int position) {
     return schools.get(position) == null ? VIEW_TYPE_LOADING : VIEW_TYPE_ITEM;
+  }
+
+  private void loadMore() {
+    isLoading = true;
+    model
+        .loadMoreSchools(
+            error -> snackbar.showError(
+                        R.string.error_fetching_school_list, view -> loadMore()))
+        .observe(lifecycleOwner, this::setSchools);
+  }
+
+  public void setSchools(List<School> schools) {
+    int previousCount = getItemCount();
+    this.schools = schools;
+    notifyItemRangeInserted(previousCount, schools.size() - previousCount);
+    isLoading = false;
   }
 
   private class ItemViewHolder extends RecyclerView.ViewHolder {
@@ -83,10 +132,6 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
       super(itemView);
       progressBar = itemView.findViewById(R.id.progressBar);
     }
-  }
-
-  private void showLoadingView(LoadingViewHolder viewHolder, int position) {
-    // ProgressBar would be displayed
   }
 
   private void populateItemRows(ItemViewHolder viewHolder, int position) {

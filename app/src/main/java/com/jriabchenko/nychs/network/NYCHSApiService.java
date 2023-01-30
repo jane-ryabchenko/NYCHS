@@ -1,8 +1,9 @@
 package com.jriabchenko.nychs.network;
 
+import android.util.Log;
+
 import com.squareup.moshi.Moshi;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,10 +50,12 @@ public class NYCHSApiService {
   }
 
   public void getSATResults(
-      String dbn, ResponseHandler<SATResults> responseHandler, FailureHandler failureHandler) {
+      String dbn,
+      ResponseHandler<List<SATResults>> responseHandler,
+      FailureHandler failureHandler) {
     executeApiCallAsync(
         api.getSATResults(APPLICATION_TOKEN, dbn),
-        results -> responseHandler.onSuccess(singleResult(results)),
+        results -> responseHandler.onSuccess(singleOrNoResult(results)),
         failureHandler);
   }
 
@@ -69,8 +72,9 @@ public class NYCHSApiService {
         throw new IllegalStateException(response.message());
       }
       responseHandler.onSuccess(response.body());
-    } catch (IOException e) {
-      failureHandler.onFailure(e);
+    } catch (Throwable t) {
+      Log.e(getClass().getSimpleName(), "REST API call error.", t);
+      failureHandler.onFailure(t);
     }
   }
 
@@ -79,5 +83,14 @@ public class NYCHSApiService {
       throw new IllegalStateException("Expected a single result, but received " + results.size());
     }
     return results.get(0);
+  }
+
+  // Can't use optional due to min version 22.
+  private static <T> List<T> singleOrNoResult(List<T> results) {
+    if (results.size() > 1) {
+      throw new IllegalStateException(
+          "Expected a single or no result, but received " + results.size());
+    }
+    return results;
   }
 }

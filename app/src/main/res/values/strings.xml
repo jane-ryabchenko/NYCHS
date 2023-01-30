@@ -2,11 +2,24 @@
     <string name="app_name">NYCHS</string>
     <string name="title_activity_school">NYC Schools</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">Schools</string>
-    <string name="second_fragment_label">Details</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
+    <string name="list_fragment_label">NYC Schools</string>
+    <string name="details_fragment_label">School Details</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="sat_results_section_title">SAT Results</string>
+    <string name="num_of_sat_test_takers">Number of takers:</string>
+    <string name="sat_critical_reading_avg_score">Critical reading average score:</string>
+    <string name="sat_math_avg_score">Math average score:</string>
+    <string name="sat_writing_avg_score">Writing average score:</string>
+    <string name="sat_results_no_data">no data</string>
+
+    <string name="contacts_section_title">School Contacts</string>
+    <string name="phone_number">Phone:</string>
+    <string name="email_address">Email:</string>
+    <string name="website_address">Website:</string>
+    <string name="location">Location:</string>
+
+    <string name="error_fetching_school_list">Unexpected error encountered while attempting to load list of schools.</string>
+    <string name="error_fetching_school_details">Unexpected error encountered while attempting to load school details.</string>
+    <string name="error_fetching_sat_results">Unexpected error encountered while attempting to load SAT results.</string>
+    <string name="error_button_retry">retry</string>
 </resources>
