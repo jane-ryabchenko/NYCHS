@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/** Snackbar wrapper allowing to show an error message with retry handler. */
 public class SnackbarWithRetry {
   private static final int MAX_RETRIES_NUMBER = 3;
 

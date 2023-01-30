@@ -2,28 +2,30 @@ package com.jriabchenko.nychs.network;
 
 import com.squareup.moshi.Json;
 
+/**
+ * Json wrapper for the school data.
+ *
+ * <p>More detailed version of {@link School} wrapper. It is used in "details" fragment where larger
+ * amount of information is displayed.
+ *
+ * <p>See <a
+ * href="https://data.cityofnewyork.us/Education/2017-DOE-High-School-Directory/s3k6-pzi2">dataset</a>.
+ */
 public class SchoolDetails {
-  @Json(name = "school_name")
-  String schoolName;
-
   @Json(name = "overview_paragraph")
-  String overviewParagraph;
+  private String overviewParagraph;
 
   @Json(name = "phone_number")
-  String phoneNumber;
+  private String phoneNumber;
 
   @Json(name = "school_email")
-  String schoolEmail;
+  private String schoolEmail;
 
   @Json(name = "website")
-  String website;
+  private String website;
 
   @Json(name = "location")
-  String location;
-
-  public String getSchoolName() {
-    return schoolName;
-  }
+  private String location;
 
   public String getOverviewParagraph() {
     return overviewParagraph;

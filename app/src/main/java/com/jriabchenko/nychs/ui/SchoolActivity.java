@@ -13,9 +13,9 @@ import com.jriabchenko.nychs.databinding.ActivitySchoolBinding;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+/** Main activity of the app. */
 @AndroidEntryPoint
 public class SchoolActivity extends AppCompatActivity {
-
   private AppBarConfiguration appBarConfiguration;
 
   @Override

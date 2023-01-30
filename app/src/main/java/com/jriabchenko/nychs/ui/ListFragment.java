@@ -18,6 +18,7 @@ import com.jriabchenko.nychs.databinding.FragmentListBinding;
 import com.jriabchenko.nychs.network.School;
 import com.jriabchenko.nychs.ui.model.SchoolListViewModel;
 
+/** Fragment displaying a view with school details and SAT results. */
 public class ListFragment extends Fragment implements SchoolListViewAdapter.SchoolClickHandler {
   private FragmentListBinding binding;
 

@@ -11,8 +11,6 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.snackbar.Snackbar;
 import com.jriabchenko.nychs.R;
 import com.jriabchenko.nychs.network.School;
 import com.jriabchenko.nychs.ui.model.SchoolListViewModel;
@@ -26,7 +24,6 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
   private final SchoolListViewModel model;
   private final LifecycleOwner lifecycleOwner;
   private final SchoolClickHandler schoolClickHandler;
-  private RecyclerView recyclerView;
   private SnackbarWithRetry snackbar;
   private List<School> schools;
   private boolean isLoading;
@@ -43,25 +40,20 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
   @Override
   public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
     super.onAttachedToRecyclerView(recyclerView);
-    this.recyclerView = recyclerView;
     snackbar = new SnackbarWithRetry(recyclerView);
     recyclerView.addOnScrollListener(
         new RecyclerView.OnScrollListener() {
-          @Override
-          public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-            super.onScrollStateChanged(recyclerView, newState);
-          }
-
           @Override
           public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
             LinearLayoutManager linearLayoutManager =
                 (LinearLayoutManager) recyclerView.getLayoutManager();
+            // Check if user scrolled to the bottom of the list.
             if (!isLoading
                 && linearLayoutManager != null
                 && linearLayoutManager.findLastCompletelyVisibleItemPosition()
                     == getItemCount() - 1) {
-              // bottom of list!
+              isLoading = true;
               loadMore();
             }
           }
@@ -101,23 +93,21 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
   }
 
   private void loadMore() {
-    isLoading = true;
     model
         .loadMoreSchools(
-            error -> snackbar.showError(
-                        R.string.error_fetching_school_list, view -> loadMore()))
-        .observe(lifecycleOwner, this::setSchools);
+            error -> snackbar.showError(R.string.error_fetching_school_list, view -> loadMore()))
+        .observe(lifecycleOwner, this::setSchoolList);
   }
 
-  public void setSchools(List<School> schools) {
+  public void setSchoolList(List<School> schools) {
     int previousCount = getItemCount();
     this.schools = schools;
     notifyItemRangeInserted(previousCount, schools.size() - previousCount);
     isLoading = false;
   }
 
-  private class ItemViewHolder extends RecyclerView.ViewHolder {
-    TextView schoolName;
+  private static class ItemViewHolder extends RecyclerView.ViewHolder {
+    private final TextView schoolName;
 
     public ItemViewHolder(@NonNull View itemView) {
       super(itemView);
@@ -125,8 +115,8 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
   }
 
-  private class LoadingViewHolder extends RecyclerView.ViewHolder {
-    ProgressBar progressBar;
+  private static class LoadingViewHolder extends RecyclerView.ViewHolder {
+    private final ProgressBar progressBar;
 
     public LoadingViewHolder(@NonNull View itemView) {
       super(itemView);
