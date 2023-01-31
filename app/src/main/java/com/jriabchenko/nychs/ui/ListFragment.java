@@ -6,13 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.snackbar.Snackbar;
 import com.jriabchenko.nychs.R;
 import com.jriabchenko.nychs.databinding.FragmentListBinding;
 import com.jriabchenko.nychs.network.School;
@@ -34,8 +31,7 @@ public class ListFragment extends Fragment implements SchoolListViewAdapter.Scho
     SchoolListViewModel model =
         new ViewModelProvider(requireActivity()).get(SchoolListViewModel.class);
     binding.schoolListView.setAdapter(
-        new SchoolListViewAdapter(
-            model, getViewLifecycleOwner(), /* schoolClickHandler = */ this));
+        new SchoolListViewAdapter(model, getViewLifecycleOwner(), /* schoolClickHandler = */ this));
   }
 
   @Override

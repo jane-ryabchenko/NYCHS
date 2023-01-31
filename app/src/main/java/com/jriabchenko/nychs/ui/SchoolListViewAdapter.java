@@ -18,6 +18,8 @@ import java.util.List;
 
 /** Adapter for {@link RecyclerView}. */
 public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+  private static final int PAGE_SIZE = 50;
+
   private final SchoolListViewModel model;
   private final LifecycleOwner lifecycleOwner;
   private final SchoolClickHandler schoolClickHandler;
@@ -79,6 +81,7 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     isLoading = true;
     model
         .loadMoreSchools(
+            PAGE_SIZE,
             error -> snackbar.showError(R.string.error_fetching_school_list, view -> loadMore()))
         .observe(lifecycleOwner, this::setSchoolList);
   }

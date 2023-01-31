@@ -13,15 +13,18 @@ import java.util.List;
 
 /** View model for the list view. */
 public class SchoolListViewModel extends ViewModel {
-  private static final int PAGE_SIZE = 50;
-
   private final MutableLiveData<List<School>> schools = new MutableLiveData<>(new ArrayList<>());
-  private final OpenDataService api = new OpenDataService();
 
-  public LiveData<List<School>> loadMoreSchools(FailureHandler failureHandler) {
+  private OpenDataService openDataService;
+
+  public void setService(OpenDataService openDataService) {
+    this.openDataService = openDataService;
+  }
+
+  public LiveData<List<School>> loadMoreSchools(int pageSize, FailureHandler failureHandler) {
     List<School> current = schools.getValue();
-    api.getSchoolList(
-        PAGE_SIZE,
+    openDataService.getSchoolList(
+        pageSize,
         current.size(),
         results -> {
           List<School> updated = new ArrayList<>(current);

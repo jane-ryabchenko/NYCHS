@@ -1,8 +1,10 @@
 package com.jriabchenko.nychs.network;
 
+import static com.jriabchenko.nychs.network.OpenDataApi.createApi;
+
 import android.util.Log;
 
-import com.squareup.moshi.Moshi;
+import androidx.annotation.VisibleForTesting;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -10,27 +12,23 @@ import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.moshi.MoshiConverterFactory;
 
 /** Service for High Schools and SAT scores data from NYC OpenData API. */
 public class OpenDataService {
-  private static final String BASE_URL = "https://data.cityofnewyork.us/";
-  private static final String APPLICATION_TOKEN = "P0GXacjpl2wIpfnW4NMRiXXJN";
 
+  private final String applicationToken;
   private final OpenDataApi api;
-
   private final ExecutorService executor;
 
-  public OpenDataService() {
-    Moshi moshi = new Moshi.Builder().build();
-    Retrofit retrofit =
-        new Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl(BASE_URL)
-            .build();
-    api = retrofit.create(OpenDataApi.class);
-    executor = Executors.newFixedThreadPool(3);
+  public OpenDataService(String applicationToken) {
+    this(applicationToken, createApi(), Executors.newFixedThreadPool(3));
+  }
+
+  @VisibleForTesting
+  public OpenDataService(String applicationToken, OpenDataApi api, ExecutorService executor) {
+    this.applicationToken = applicationToken;
+    this.api = api;
+    this.executor = executor;
   }
 
   /**
@@ -51,7 +49,7 @@ public class OpenDataService {
       throw new IllegalArgumentException("Offset should be non-negative.");
     }
     executeApiCallAsync(
-        api.getSchoolList(APPLICATION_TOKEN, limit, offset), responseHandler, failureHandler);
+        api.getSchoolList(applicationToken, limit, offset), responseHandler, failureHandler);
   }
 
   /**
@@ -63,7 +61,7 @@ public class OpenDataService {
   public void getSchoolDetails(
       String dbn, ResponseHandler<SchoolDetails> responseHandler, FailureHandler failureHandler) {
     executeApiCallAsync(
-        api.getSchoolDetails(APPLICATION_TOKEN, dbn),
+        api.getSchoolDetails(applicationToken, dbn),
         results -> responseHandler.onSuccess(singleResult(results)),
         failureHandler);
   }
@@ -79,7 +77,7 @@ public class OpenDataService {
       ResponseHandler<List<SatResults>> responseHandler,
       FailureHandler failureHandler) {
     executeApiCallAsync(
-        api.getSatResults(APPLICATION_TOKEN, dbn),
+        api.getSatResults(applicationToken, dbn),
         results -> responseHandler.onSuccess(singleOrNoResult(results)),
         failureHandler);
   }
@@ -100,9 +98,14 @@ public class OpenDataService {
       }
       responseHandler.onSuccess(response.body());
     } catch (Throwable t) {
-      Log.e(getClass().getSimpleName(), "REST API call error.", t);
+      logError(t);
       failureHandler.onFailure(t);
     }
+  }
+
+  @VisibleForTesting
+  protected void logError(Throwable t) {
+    Log.e(getClass().getSimpleName(), "REST API call error.", t);
   }
 
   /** Verifies that exactly single result was returned. */
