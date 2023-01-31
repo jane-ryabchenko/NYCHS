@@ -3,7 +3,6 @@ package com.jriabchenko.nychs.ui;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,10 +16,8 @@ import com.jriabchenko.nychs.ui.model.SchoolListViewModel;
 
 import java.util.List;
 
+/** Adapter for {@link RecyclerView}. */
 public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-  private final int VIEW_TYPE_ITEM = 0;
-  private final int VIEW_TYPE_LOADING = 1;
-
   private final SchoolListViewModel model;
   private final LifecycleOwner lifecycleOwner;
   private final SchoolClickHandler schoolClickHandler;
@@ -53,8 +50,7 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 && linearLayoutManager != null
                 && linearLayoutManager.findLastCompletelyVisibleItemPosition()
                     == getItemCount() - 1) {
-              isLoading = true;
-              loadMore();
+              recyclerView.post(() -> loadMore());
             }
           }
         });
@@ -64,22 +60,14 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-    if (viewType == VIEW_TYPE_ITEM) {
-      View view =
-          LayoutInflater.from(parent.getContext()).inflate(R.layout.school_list_row, parent, false);
-      return new ItemViewHolder(view);
-    }
     View view =
-        LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.school_list_loading, parent, false);
-    return new LoadingViewHolder(view);
+        LayoutInflater.from(parent.getContext()).inflate(R.layout.school_list_row, parent, false);
+    return new ItemViewHolder(view, schoolClickHandler);
   }
 
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
-    if (viewHolder instanceof ItemViewHolder) {
-      populateItemRows((ItemViewHolder) viewHolder, position);
-    }
+    ((ItemViewHolder) viewHolder).setSchool(schools.get(position));
   }
 
   @Override
@@ -87,12 +75,8 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     return schools == null ? 0 : schools.size();
   }
 
-  @Override
-  public int getItemViewType(int position) {
-    return schools.get(position) == null ? VIEW_TYPE_LOADING : VIEW_TYPE_ITEM;
-  }
-
   private void loadMore() {
+    isLoading = true;
     model
         .loadMoreSchools(
             error -> snackbar.showError(R.string.error_fetching_school_list, view -> loadMore()))
@@ -108,26 +92,18 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
   private static class ItemViewHolder extends RecyclerView.ViewHolder {
     private final TextView schoolName;
+    private School school;
 
-    public ItemViewHolder(@NonNull View itemView) {
+    public ItemViewHolder(@NonNull View itemView, SchoolClickHandler schoolClickHandler) {
       super(itemView);
       schoolName = itemView.findViewById(R.id.schoolName);
+      schoolName.setOnClickListener(view -> schoolClickHandler.onSchoolClick(school));
     }
-  }
 
-  private static class LoadingViewHolder extends RecyclerView.ViewHolder {
-    private final ProgressBar progressBar;
-
-    public LoadingViewHolder(@NonNull View itemView) {
-      super(itemView);
-      progressBar = itemView.findViewById(R.id.progressBar);
+    public void setSchool(School school) {
+      this.school = school;
+      schoolName.setText(school.getSchoolName());
     }
-  }
-
-  private void populateItemRows(ItemViewHolder viewHolder, int position) {
-    School school = schools.get(position);
-    viewHolder.schoolName.setText(school.getSchoolName());
-    viewHolder.schoolName.setOnClickListener(view -> schoolClickHandler.onSchoolClick(school));
   }
 
   interface SchoolClickHandler {
