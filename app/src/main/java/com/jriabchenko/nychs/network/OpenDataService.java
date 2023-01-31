@@ -60,6 +60,9 @@ public class OpenDataService {
    */
   public void getSchoolDetails(
       String dbn, ResponseHandler<SchoolDetails> responseHandler, FailureHandler failureHandler) {
+    if (dbn == null) {
+      throw new IllegalArgumentException("DBN should not be null.");
+    }
     executeApiCallAsync(
         api.getSchoolDetails(applicationToken, dbn),
         results -> responseHandler.onSuccess(singleResult(results)),
@@ -76,6 +79,9 @@ public class OpenDataService {
       String dbn,
       ResponseHandler<List<SatResults>> responseHandler,
       FailureHandler failureHandler) {
+    if (dbn == null) {
+      throw new IllegalArgumentException("DBN should not be null.");
+    }
     executeApiCallAsync(
         api.getSatResults(applicationToken, dbn),
         results -> responseHandler.onSuccess(singleOrNoResult(results)),
