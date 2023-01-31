@@ -24,7 +24,7 @@ public class SnackbarWithRetry {
   }
 
   public void reset() {
-   retryCounter.set(0);
+    retryCounter.set(0);
   }
 
   public void showError(@StringRes int id, View.OnClickListener onRetryListener) {

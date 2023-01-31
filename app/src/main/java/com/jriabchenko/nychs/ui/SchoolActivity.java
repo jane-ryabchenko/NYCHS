@@ -26,7 +26,8 @@ public class SchoolActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
 
     OpenDataService openDataService = new OpenDataService(APPLICATION_TOKEN);
-    SchoolDetailsViewModel detailsViewModel = new ViewModelProvider(this).get(SchoolDetailsViewModel.class);
+    SchoolDetailsViewModel detailsViewModel =
+        new ViewModelProvider(this).get(SchoolDetailsViewModel.class);
     detailsViewModel.setService(openDataService);
 
     SchoolListViewModel listViewModel = new ViewModelProvider(this).get(SchoolListViewModel.class);

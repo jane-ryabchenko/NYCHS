@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
@@ -187,21 +188,21 @@ public class OpenDataServiceTest {
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolList(int limit, int offset, School... result) throws IOException {
-    Call<ImmutableList<School>> call = mock(Call.class);
+    Call<List<School>> call = mock(Call.class);
     when(call.execute()).thenReturn(Response.success(ImmutableList.copyOf(result)));
     when(openDataApi.getSchoolList(APPLICATION_TOKEN, limit, offset)).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolListFailure(int limit, int offset, Throwable t) throws IOException {
-    Call<ImmutableList<School>> call = mock(Call.class);
+    Call<List<School>> call = mock(Call.class);
     when(call.execute()).thenThrow(t);
     when(openDataApi.getSchoolList(APPLICATION_TOKEN, limit, offset)).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolsListError(int limit, int offset, int errorCode) throws IOException {
-    Call<ImmutableList<School>> call = mock(Call.class);
+    Call<List<School>> call = mock(Call.class);
     when(call.execute())
         .thenReturn(
             Response.error(errorCode, ResponseBody.create(MediaType.get("text/plain"), "Error")));
@@ -210,21 +211,21 @@ public class OpenDataServiceTest {
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolDetails(String dbn, SchoolDetails... result) throws IOException {
-    Call<ImmutableList<SchoolDetails>> call = mock(Call.class);
+    Call<List<SchoolDetails>> call = mock(Call.class);
     when(call.execute()).thenReturn(Response.success(ImmutableList.copyOf(result)));
     when(openDataApi.getSchoolDetails(APPLICATION_TOKEN, dbn)).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolDetailsFailure(String dbn, Throwable t) throws IOException {
-    Call<ImmutableList<SchoolDetails>> call = mock(Call.class);
+    Call<List<SchoolDetails>> call = mock(Call.class);
     when(call.execute()).thenThrow(t);
     when(openDataApi.getSchoolDetails(APPLICATION_TOKEN, dbn)).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolDetailsError(String dbn, int errorCode) throws IOException {
-    Call<ImmutableList<SchoolDetails>> call = mock(Call.class);
+    Call<List<SchoolDetails>> call = mock(Call.class);
     when(call.execute())
         .thenReturn(
             Response.error(errorCode, ResponseBody.create(MediaType.get("text/plain"), "Error")));
@@ -233,21 +234,21 @@ public class OpenDataServiceTest {
 
   @SuppressWarnings("unchecked")
   private void mockGetSatResults(String dbn, SatResults... result) throws IOException {
-    Call<ImmutableList<SatResults>> call = mock(Call.class);
+    Call<List<SatResults>> call = mock(Call.class);
     when(call.execute()).thenReturn(Response.success(ImmutableList.copyOf(result)));
     when(openDataApi.getSatResults(APPLICATION_TOKEN, dbn)).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockGetSatResultsFailure(String dbn, Throwable t) throws IOException {
-    Call<ImmutableList<SatResults>> call = mock(Call.class);
+    Call<List<SatResults>> call = mock(Call.class);
     when(call.execute()).thenThrow(t);
     when(openDataApi.getSatResults(APPLICATION_TOKEN, dbn)).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockGetSatResultsError(String dbn, int errorCode) throws IOException {
-    Call<ImmutableList<SatResults>> call = mock(Call.class);
+    Call<List<SatResults>> call = mock(Call.class);
     when(call.execute())
         .thenReturn(
             Response.error(errorCode, ResponseBody.create(MediaType.get("text/plain"), "Error")));

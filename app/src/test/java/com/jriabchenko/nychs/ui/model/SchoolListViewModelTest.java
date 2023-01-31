@@ -26,6 +26,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
@@ -106,14 +107,14 @@ public class SchoolListViewModelTest {
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolListResult(int offset, School... result) throws IOException {
-    Call<ImmutableList<School>> call = mock(Call.class);
+    Call<List<School>> call = mock(Call.class);
     when(call.execute()).thenReturn(Response.success(ImmutableList.copyOf(result)));
     when(openDataApi.getSchoolList(APPLICATION_TOKEN, PAGE_SIZE, offset)).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolListFailure(Throwable t) throws IOException {
-    Call<ImmutableList<School>> call = mock(Call.class);
+    Call<List<School>> call = mock(Call.class);
     when(call.execute()).thenThrow(t);
     when(openDataApi.getSchoolList(eq(APPLICATION_TOKEN), eq(PAGE_SIZE), anyInt()))
         .thenReturn(call);
@@ -121,7 +122,7 @@ public class SchoolListViewModelTest {
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolsListError(int errorCode) throws IOException {
-    Call<ImmutableList<School>> call = mock(Call.class);
+    Call<List<School>> call = mock(Call.class);
     when(call.execute())
         .thenReturn(
             Response.error(errorCode, ResponseBody.create(MediaType.get("text/plain"), "Error")));
