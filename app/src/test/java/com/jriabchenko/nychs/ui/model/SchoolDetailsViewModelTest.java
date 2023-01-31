@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.jriabchenko.nychs.network.FailureHandler;
 import com.jriabchenko.nychs.network.OpenDataApi;
@@ -25,8 +26,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
@@ -140,7 +139,7 @@ public class SchoolDetailsViewModelTest {
   public void loadSatResults_noResults() throws IOException {
     mockLoadSatResults();
 
-    LiveData<List<SatResults>> result = model.loadSatResults(DBN_1, failureHandler);
+    LiveData<ImmutableList<SatResults>> result = model.loadSatResults(DBN_1, failureHandler);
 
     result.observeForever(data -> {});
     assertThat(result.getValue()).isEmpty();
@@ -150,7 +149,7 @@ public class SchoolDetailsViewModelTest {
   public void loadSatResults_success() throws IOException {
     mockLoadSatResults(RESULTS_1);
 
-    LiveData<List<SatResults>> result = model.loadSatResults(DBN_1, failureHandler);
+    LiveData<ImmutableList<SatResults>> result = model.loadSatResults(DBN_1, failureHandler);
 
     result.observeForever(data -> {});
     assertThat(result.getValue()).containsExactly(RESULTS_1);
@@ -158,21 +157,21 @@ public class SchoolDetailsViewModelTest {
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolDetails(SchoolDetails... result) throws IOException {
-    Call<List<SchoolDetails>> call = mock(Call.class);
-    when(call.execute()).thenReturn(Response.success(Arrays.asList(result)));
+    Call<ImmutableList<SchoolDetails>> call = mock(Call.class);
+    when(call.execute()).thenReturn(Response.success(ImmutableList.copyOf(result)));
     when(openDataApi.getSchoolDetails(APPLICATION_TOKEN, DBN_1)).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolDetailsFailure(Throwable t) throws IOException {
-    Call<List<SchoolDetails>> call = mock(Call.class);
+    Call<ImmutableList<SchoolDetails>> call = mock(Call.class);
     when(call.execute()).thenThrow(t);
     when(openDataApi.getSchoolDetails(eq(APPLICATION_TOKEN), eq(DBN_1))).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolDetailsError(int errorCode) throws IOException {
-    Call<List<SchoolDetails>> call = mock(Call.class);
+    Call<ImmutableList<SchoolDetails>> call = mock(Call.class);
     when(call.execute())
         .thenReturn(
             Response.error(errorCode, ResponseBody.create(MediaType.get("text/plain"), "Error")));
@@ -181,21 +180,21 @@ public class SchoolDetailsViewModelTest {
 
   @SuppressWarnings("unchecked")
   private void mockLoadSatResults(SatResults... result) throws IOException {
-    Call<List<SatResults>> call = mock(Call.class);
-    when(call.execute()).thenReturn(Response.success(Arrays.asList(result)));
+    Call<ImmutableList<SatResults>> call = mock(Call.class);
+    when(call.execute()).thenReturn(Response.success(ImmutableList.copyOf(result)));
     when(openDataApi.getSatResults(APPLICATION_TOKEN, DBN_1)).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockLoadSatResultsFailure(Throwable t) throws IOException {
-    Call<List<SatResults>> call = mock(Call.class);
+    Call<ImmutableList<SatResults>> call = mock(Call.class);
     when(call.execute()).thenThrow(t);
     when(openDataApi.getSatResults(eq(APPLICATION_TOKEN), eq(DBN_1))).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockLoadSatResultsError(int errorCode) throws IOException {
-    Call<List<SatResults>> call = mock(Call.class);
+    Call<ImmutableList<SatResults>> call = mock(Call.class);
     when(call.execute())
         .thenReturn(
             Response.error(errorCode, ResponseBody.create(MediaType.get("text/plain"), "Error")));

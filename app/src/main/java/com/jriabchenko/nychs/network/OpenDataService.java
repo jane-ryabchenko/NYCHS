@@ -6,6 +6,8 @@ import android.util.Log;
 
 import androidx.annotation.VisibleForTesting;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,7 +42,7 @@ public class OpenDataService {
   public void getSchoolList(
       int limit,
       int offset,
-      ResponseHandler<List<School>> responseHandler,
+      ResponseHandler<ImmutableList<School>> responseHandler,
       FailureHandler failureHandler) {
     if (limit < 1) {
       throw new IllegalArgumentException("Limit should be positive.");
@@ -77,7 +79,7 @@ public class OpenDataService {
    */
   public void getSatResults(
       String dbn,
-      ResponseHandler<List<SatResults>> responseHandler,
+      ResponseHandler<ImmutableList<SatResults>> responseHandler,
       FailureHandler failureHandler) {
     if (dbn == null) {
       throw new IllegalArgumentException("DBN should not be null.");
@@ -90,19 +92,23 @@ public class OpenDataService {
 
   /** Async wrapper for the call. */
   private <T> void executeApiCallAsync(
-      Call<List<T>> call, ResponseHandler<List<T>> responseHandler, FailureHandler failureHandler) {
+      Call<List<T>> call,
+      ResponseHandler<ImmutableList<T>> responseHandler,
+      FailureHandler failureHandler) {
     executor.execute(() -> executeApiCall(call, responseHandler, failureHandler));
   }
 
   /** Executes call and handles result or failure. */
   private <T> void executeApiCall(
-      Call<List<T>> call, ResponseHandler<List<T>> responseHandler, FailureHandler failureHandler) {
+      Call<List<T>> call,
+      ResponseHandler<ImmutableList<T>> responseHandler,
+      FailureHandler failureHandler) {
     try {
       Response<List<T>> response = call.execute();
       if (!response.isSuccessful()) {
         throw new IllegalStateException(response.message());
       }
-      responseHandler.onSuccess(response.body());
+      responseHandler.onSuccess(ImmutableList.copyOf(response.body()));
     } catch (Throwable t) {
       logError(t);
       failureHandler.onFailure(t);
@@ -115,7 +121,7 @@ public class OpenDataService {
   }
 
   /** Verifies that exactly single result was returned. */
-  private static <T> T singleResult(List<T> results) {
+  private static <T> T singleResult(ImmutableList<T> results) {
     if (results.size() != 1) {
       throw new IllegalStateException("Expected a single result, but received " + results.size());
     }
@@ -123,7 +129,7 @@ public class OpenDataService {
   }
 
   /** Verifies that single or no result was returned. */
-  private static <T> List<T> singleOrNoResult(List<T> results) {
+  private static <T> ImmutableList<T> singleOrNoResult(ImmutableList<T> results) {
     // Can't use optional due to min version 22.
     if (results.size() > 1) {
       throw new IllegalStateException(

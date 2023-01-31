@@ -4,12 +4,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.common.collect.ImmutableList;
 import com.jriabchenko.nychs.network.FailureHandler;
 import com.jriabchenko.nychs.network.OpenDataService;
 import com.jriabchenko.nychs.network.SatResults;
 import com.jriabchenko.nychs.network.SchoolDetails;
-
-import java.util.List;
 
 /** View model for the detailed view. */
 public class SchoolDetailsViewModel extends ViewModel {
@@ -25,8 +24,9 @@ public class SchoolDetailsViewModel extends ViewModel {
     return schoolDetails;
   }
 
-  public LiveData<List<SatResults>> loadSatResults(String dbn, FailureHandler failureHandler) {
-    MutableLiveData<List<SatResults>> satResults = new MutableLiveData<>();
+  public LiveData<ImmutableList<SatResults>> loadSatResults(
+      String dbn, FailureHandler failureHandler) {
+    MutableLiveData<ImmutableList<SatResults>> satResults = new MutableLiveData<>();
     openDataService.getSatResults(dbn, satResults::postValue, failureHandler);
     return satResults;
   }

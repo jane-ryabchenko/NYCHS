@@ -10,11 +10,10 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.common.collect.ImmutableList;
 import com.jriabchenko.nychs.R;
 import com.jriabchenko.nychs.network.School;
 import com.jriabchenko.nychs.ui.model.SchoolListViewModel;
-
-import java.util.List;
 
 /** Adapter for {@link RecyclerView}. */
 public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -24,7 +23,7 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
   private final LifecycleOwner lifecycleOwner;
   private final SchoolClickHandler schoolClickHandler;
   private SnackbarWithRetry snackbar;
-  private List<School> schools;
+  private ImmutableList<School> schools;
   private boolean isLoading;
 
   public SchoolListViewAdapter(
@@ -86,7 +85,7 @@ public class SchoolListViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         .observe(lifecycleOwner, this::setSchoolList);
   }
 
-  public void setSchoolList(List<School> schools) {
+  public void setSchoolList(ImmutableList<School> schools) {
     int previousCount = getItemCount();
     this.schools = schools;
     notifyItemRangeInserted(previousCount, schools.size() - previousCount);

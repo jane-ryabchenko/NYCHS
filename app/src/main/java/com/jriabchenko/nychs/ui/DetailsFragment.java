@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.common.collect.ImmutableList;
 import com.jriabchenko.nychs.R;
 import com.jriabchenko.nychs.databinding.FragmentDetailsBinding;
 import com.jriabchenko.nychs.network.SatResults;
@@ -17,7 +18,6 @@ import com.jriabchenko.nychs.ui.model.SchoolDetailsViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /** Fragment displaying a recycle view with "infinite scroll. */
@@ -91,7 +91,7 @@ public class DetailsFragment extends Fragment {
     maybeShowContent();
   }
 
-  private void setSatResults(List<SatResults> resultList) {
+  private void setSatResults(ImmutableList<SatResults> resultList) {
     if (resultList.isEmpty()) {
       binding.numOfSatTestTakers.setText(R.string.sat_results_no_data);
       binding.satMathAvgScore.setText(R.string.sat_results_no_data);

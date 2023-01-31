@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.jriabchenko.nychs.network.FailureHandler;
 import com.jriabchenko.nychs.network.OpenDataApi;
@@ -25,8 +26,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
@@ -87,7 +86,7 @@ public class SchoolListViewModelTest {
     mockGetSchoolListResult(4);
 
     // Step 1. Load first page
-    LiveData<List<School>> result = model.loadMoreSchools(PAGE_SIZE, failureHandler);
+    LiveData<ImmutableList<School>> result = model.loadMoreSchools(PAGE_SIZE, failureHandler);
 
     result.observeForever(data -> {});
     assertThat(result.getValue()).containsExactly(SCHOOL_1, SCHOOL_2).inOrder();
@@ -107,14 +106,14 @@ public class SchoolListViewModelTest {
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolListResult(int offset, School... result) throws IOException {
-    Call<List<School>> call = mock(Call.class);
-    when(call.execute()).thenReturn(Response.success(Arrays.asList(result)));
+    Call<ImmutableList<School>> call = mock(Call.class);
+    when(call.execute()).thenReturn(Response.success(ImmutableList.copyOf(result)));
     when(openDataApi.getSchoolList(APPLICATION_TOKEN, PAGE_SIZE, offset)).thenReturn(call);
   }
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolListFailure(Throwable t) throws IOException {
-    Call<List<School>> call = mock(Call.class);
+    Call<ImmutableList<School>> call = mock(Call.class);
     when(call.execute()).thenThrow(t);
     when(openDataApi.getSchoolList(eq(APPLICATION_TOKEN), eq(PAGE_SIZE), anyInt()))
         .thenReturn(call);
@@ -122,7 +121,7 @@ public class SchoolListViewModelTest {
 
   @SuppressWarnings("unchecked")
   private void mockGetSchoolsListError(int errorCode) throws IOException {
-    Call<List<School>> call = mock(Call.class);
+    Call<ImmutableList<School>> call = mock(Call.class);
     when(call.execute())
         .thenReturn(
             Response.error(errorCode, ResponseBody.create(MediaType.get("text/plain"), "Error")));
